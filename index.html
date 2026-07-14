@@ -1,0 +1,2149 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PORTOFOLIO ALFINANFAHRI // VISUAL ARCHIVE</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Syne (Bold Display) & Space Grotesk (Clean Sans-Serif) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- GSAP (GreenSock Animation Platform) for smooth animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Supabase (Database + Auth + Storage) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script>
+        // ============================================================
+        // GANTI DUA NILAI DI BAWAH INI DENGAN KREDENSIAL SUPABASE KAMU
+        // Dapat dari: Project Settings > API di dashboard Supabase
+        // ============================================================
+        const SUPABASE_URL = "https://GANTI-DENGAN-PROJECT-ID.supabase.co";
+        const SUPABASE_ANON_KEY = "GANTI-DENGAN-ANON-PUBLIC-KEY";
+        const SUPABASE_CONFIGURED = !SUPABASE_URL.includes("GANTI") && !SUPABASE_ANON_KEY.includes("GANTI");
+        const sb = SUPABASE_CONFIGURED ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+    </script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandDark: '#0A0A0A',
+                        brandGray: '#161616',
+                        brandNeon: '#00FF66',
+                        brandPink: '#FF0055',
+                        brandLight: '#F3F4F6'
+                    },
+                    fontFamily: {
+                        display: ['Syne', 'sans-serif'],
+                        sans: ['Space Grotesk', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom noise & grid background effects */
+        .noise-bg {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+        .text-stroke {
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
+            color: transparent;
+        }
+        .text-stroke:hover {
+            -webkit-text-stroke: 1px #00FF66;
+            color: #00FF66;
+            transition: all 0.3s ease;
+        }
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0A0A0A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #222;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00FF66;
+        }
+
+        /* Edit Mode Styles */
+        .edit-highlight {
+            outline: 2px dashed #00FF66 !important;
+            outline-offset: 4px;
+            cursor: pointer;
+        }
+        .edit-highlight:hover {
+            background-color: rgba(0, 255, 102, 0.03);
+        }
+        
+        /* Drag and drop hover styling */
+        .drag-hover {
+            border: 2px dashed #00FF66 !important;
+            opacity: 0.6;
+        }
+    </style>
+
+    <style id="portfolio-zoom-style">
+        #portfolio-size-control {
+            margin: 20px 0;
+            color: white;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+        .portfolio-scale-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            max-width: 320px;
+        }
+        .portfolio-scale-wrap input[type="range"]{
+            width: 100%;
+            max-width: 220px;
+            accent-color:#00FF66;
+            cursor:pointer;
+        }
+        .portfolio-scale-wrap input[type="range"]::-webkit-slider-thumb{background:#00FF66;}
+        .portfolio-scale-wrap input[type="range"]::-moz-range-thumb{background:#00FF66;}
+
+        /* Gallery grid uses CSS columns — gap always stays the same */
+        #gallery-grid {
+            gap: 2rem;
+        }
+
+        /* Card tidak pakai transform scale, tapi width dikontrol via columns */
+        .project-card {
+            width: 100%;
+            margin-bottom: 2rem;
+            break-inside: avoid;
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+
+        /* Dynamic fluid typography for card content */
+        .project-card-title {
+            font-size: calc(11px + (9 * var(--card-scale, 1)) * 1px) !important;
+            line-height: 1.2;
+        }
+        .project-card-desc {
+            font-size: calc(9px + (5 * var(--card-scale, 1)) * 1px) !important;
+            line-height: 1.3;
+        }
+    </style>
+
+    <style id="zoom-fix-style">
+        .gallery-zoom-wrap{margin:16px 0 24px 0}
+    </style>
+</head>
+<body class="bg-brandDark text-brandLight font-sans overflow-x-hidden selection:bg-brandNeon selection:text-brandDark">
+
+    <!-- Top Alert Banner for Editor Mode -->
+    <div id="editor-banner" class="hidden fixed top-0 left-0 w-full bg-brandNeon text-black font-semibold text-[10px] sm:text-xs md:text-sm py-2 px-4 z-[999] text-center uppercase tracking-widest transition-all duration-300">
+        ⚠️ MODE BUILDER AKTIF: Dekati elemen apa saja untuk Memindahkan, Menghapus, atau Menambah baris teks baru!
+    </div>
+
+    <!-- Header / Navigation -->
+    <header class="fixed top-0 left-0 w-full z-50 bg-brandDark/80 backdrop-blur-md border-b border-white/5 py-4 px-6 md:px-12 flex justify-between items-center transition-all duration-300">
+        <a href="#" id="brand-logo" data-editable="logo" class="font-display text-2xl font-extrabold tracking-tighter text-white hover:text-brandNeon transition-colors">
+            ALFINANFAHRI<span class="text-brandNeon">.</span>
+        </a>
+        <nav class="hidden md:flex space-x-8 items-center font-semibold text-sm tracking-widest uppercase">
+            <a href="#work" class="hover:text-brandNeon transition-colors">GALLERY</a>
+            <a href="#connect" class="hover:text-brandNeon transition-colors">CONNECT</a>
+        </nav>
+        <!-- Mobile Menu Button -->
+        <button id="menu-btn" class="md:hidden text-white hover:text-brandNeon focus:outline-none">
+            <i class="fa-solid fa-bars-staggered text-2xl"></i>
+        </button>
+    </header>
+
+    <!-- Mobile Navigation Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 z-40 bg-brandDark flex flex-col justify-center items-center space-y-8 text-3xl font-display font-extrabold tracking-wider transform translate-x-full transition-transform duration-500">
+        <button id="close-btn" class="absolute top-6 right-6 text-white hover:text-brandNeon">
+            <i class="fa-solid fa-xmark text-3xl"></i>
+        </button>
+        <a href="#work" class="mobile-link hover:text-brandNeon">GALLERY</a>
+        <a href="#connect" class="mobile-link hover:text-brandNeon">CONNECT</a>
+    </div>
+
+    <!-- Hero Section (Static Top) -->
+    <section class="relative min-h-screen flex items-center justify-center pt-20 noise-bg overflow-hidden px-6">
+        <!-- Floating Elements Background -->
+        <div class="absolute top-1/4 left-1/10 w-96 h-96 bg-brandNeon/5 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-1/4 right-1/10 w-96 h-96 bg-brandPink/5 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-6xl w-full mx-auto text-center z-10">
+            <div class="inline-block border border-white/20 text-gray-400 bg-white/5 text-xs md:text-sm font-semibold tracking-widest uppercase px-4 py-2 mb-6 rounded-full">
+                ⚡ PORTOFOLIO ALFINANFAHRI ⚡
+            </div>
+            
+            <h1 data-editable="hero-title" class="font-display text-4xl xs:text-5xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter text-white uppercase leading-none break-words">
+                CREATIVE <br class="hidden md:inline">
+                <span class="text-stroke">CHAOS</span> EXHIBIT
+            </h1>
+            
+            <p data-editable="hero-desc" class="mt-8 text-base md:text-2xl text-gray-400 max-w-2xl mx-auto font-light leading-relaxed">
+                Eksplorasi visual independen, estetika subkultur jalanan yang berisik, dan dokumentasi karya seni apparel serta visual sinematik yang berani tampil beda.
+            </p>
+
+            <div class="mt-12 flex flex-col sm:flex-row gap-4 justify-center items-center w-full max-w-xs sm:max-w-none mx-auto">
+                <a href="#work" class="w-full sm:w-auto px-8 py-4 bg-white text-black font-semibold tracking-wider hover:bg-brandNeon hover:text-black transition-all duration-300 transform hover:-translate-y-1 uppercase shadow-[4px_4px_0px_0px_#00FF66] text-center">
+                    Masuk Galeri <i class="fa-solid fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Scroll Down indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2">
+            <span class="text-xs tracking-widest text-gray-500 uppercase">Scroll kebawah</span>
+            <div class="w-[2px] h-12 bg-white/10 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1/2 bg-brandNeon animate-bounce"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- REARRANGEABLE SECTIONS WRAPPER -->
+    <main id="sections-container" class="relative">
+
+        <!-- Work/Gallery Section -->
+        <section id="work" class="group/section py-24 bg-brandGray px-6 md:px-12 relative border-t border-b border-white/5">
+            <!-- Dynamic Section Reorder Control UI (Hidden in production) -->
+            <div class="section-editor-ui hidden absolute top-4 right-4 z-40 bg-brandDark/90 border border-brandNeon p-2 flex gap-1.5 shadow-lg">
+                <span class="text-[10px] text-brandNeon font-bold uppercase mr-2 flex items-center">Layout Gallery:</span>
+                <button onclick="moveSectionUp('work')" class="bg-brandNeon hover:bg-white text-black px-3 py-1 text-xs font-black uppercase transition-colors" title="Naikkan Urutan">↑</button>
+                <button onclick="moveSectionDown('work')" class="bg-brandNeon hover:bg-white text-black px-3 py-1 text-xs font-black uppercase transition-colors" title="Turunkan Urutan">↓</button>
+                <button onclick="deleteSection('work')" class="bg-brandPink hover:bg-white text-white hover:text-black px-3 py-1 text-xs font-black uppercase transition-colors" title="Sembunyikan Bagian">✕ Sembunyikan</button>
+            </div>
+
+            <div class="max-w-7xl w-full mx-auto">
+                <!-- Header section -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
+                    <div>
+                        <span data-editable="work-sub" class="text-brandNeon text-sm font-semibold tracking-widest uppercase block mb-2">// VISUAL PORTFOLIO</span>
+                        <h2 data-editable="work-title" class="font-display text-4xl md:text-6xl font-extrabold tracking-tight uppercase text-white">
+                            THE ARCHIVE
+                        </h2>
+                    </div>
+                    <div class="flex flex-wrap gap-3 items-center">
+                        <button onclick="filterGallery('all')" class="filter-btn active px-3 py-2 border border-brandNeon bg-brandNeon text-black font-semibold text-[11px] sm:text-xs uppercase tracking-wider transition-all duration-300">
+                            ALL WORKS
+                        </button>
+                        <button onclick="filterGallery('apparel')" class="filter-btn px-3 py-2 border border-white/10 hover:border-brandNeon text-white hover:text-brandNeon font-semibold text-[11px] sm:text-xs uppercase tracking-wider transition-all duration-300">
+                            APPAREL
+                        </button>
+                        <button onclick="filterGallery('visual design')" class="filter-btn px-3 py-2 border border-white/10 hover:border-brandNeon text-white hover:text-brandNeon font-semibold text-[11px] sm:text-xs uppercase tracking-wider transition-all duration-300">
+                            VISUAL DESIGN
+                        </button>
+                        <button onclick="filterGallery('vector')" class="filter-btn px-3 py-2 border border-white/10 hover:border-brandNeon text-white hover:text-brandNeon font-semibold text-[11px] sm:text-xs uppercase tracking-wider transition-all duration-300">
+                            VECTOR / ILLUSTRATION
+                        </button>
+                        <button onclick="filterGallery('photo')" class="filter-btn px-3 py-2 border border-white/10 hover:border-brandNeon text-white hover:text-brandNeon font-semibold text-[11px] sm:text-xs uppercase tracking-wider transition-all duration-300">
+                            PHOTO
+                        </button>
+                        <button onclick="filterGallery('video')" class="filter-btn px-3 py-2 border border-white/10 hover:border-brandNeon text-white hover:text-brandNeon font-semibold text-[11px] sm:text-xs uppercase tracking-wider transition-all duration-300">
+                            VIDEO
+                        </button>
+                        <!-- Add Project Button -->
+                        <button id="add-project-btn" onclick="openAddProjectModal()" class="hidden px-3 py-2 bg-brandPink text-white font-semibold text-[11px] sm:text-xs uppercase tracking-wider transition-all duration-300 hover:bg-white hover:text-black">
+                            <i class="fa-solid fa-plus mr-1"></i> TAMBAH KARYA
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Instruction info for sorting -->
+                <div id="drag-instruction" class="hidden text-brandNeon text-xs uppercase tracking-widest font-semibold mb-6 animate-pulse">
+                    💡 Tips: Klik, tahan, dan geser kartu karya di bawah untuk mengubah urutan pameran galerimu!
+                </div>
+
+                <div id="portfolio-size-control">
+                    <div class="portfolio-scale-wrap">
+                        <span class="text-xs uppercase select-none">SIZE</span>
+                        <input type="range" id="portfolioScaleSlider" min="20" max="100" value="100">
+                        <span id="portfolioScaleValue" class="text-xs font-mono">100%</span>
+                    </div>
+                </div>
+                <!-- Gallery Grid (Masonry CSS columns style) -->
+                <div id="gallery-grid" class="w-full mx-auto">
+                    <!-- Project cards render dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact & Connect Section -->
+        <section id="connect" class="group/section py-24 bg-brandDark px-6 md:px-12 relative">
+            <!-- Dynamic Section Reorder Control UI (Hidden in production) -->
+            <div class="section-editor-ui hidden absolute top-4 right-4 z-40 bg-brandDark/90 border border-brandNeon p-2 flex gap-1.5 shadow-lg">
+                <span class="text-[10px] text-brandNeon font-bold uppercase mr-2 flex items-center">Layout Connect:</span>
+                <button onclick="moveSectionUp('connect')" class="bg-brandNeon hover:bg-white text-black px-3 py-1 text-xs font-black uppercase transition-colors" title="Naikkan Urutan">↑</button>
+                <button onclick="moveSectionDown('connect')" class="bg-brandNeon hover:bg-white text-black px-3 py-1 text-xs font-black uppercase transition-colors" title="Turunkan Urutan">↓</button>
+                <button onclick="deleteSection('connect')" class="bg-brandPink hover:bg-white text-white hover:text-black px-3 py-1 text-xs font-black uppercase transition-colors" title="Sembunyikan Bagian">✕ Sembunyikan</button>
+            </div>
+
+            <div class="max-w-4xl w-full mx-auto text-center space-y-12">
+                <div class="space-y-4">
+                    <span data-editable="connect-sub" class="text-brandNeon text-sm font-semibold tracking-widest uppercase block mb-2">// ARCHIVE CHANNELS</span>
+                    <h2 data-editable="connect-title" class="font-display text-4xl md:text-7xl font-extrabold tracking-tight uppercase text-white leading-none">
+                        STAY IN TOUCH <br>
+                        WITH THE <span class="text-stroke">CHAOS</span>
+                    </h2>
+                    <p data-editable="connect-desc" class="text-gray-400 text-base md:text-lg max-w-xl mx-auto">
+                        Karya-karya terbaru dan eksperimen konsep visual harian diunggah langsung melalui media sosial kami. Hubungi saya dari kanal di bawah.
+                    </p>
+                </div>
+
+                <!-- Social Card Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto pt-6">
+                    <a id="link-ig" href="#" class="group p-6 bg-brandGray border border-white/10 hover:border-brandNeon hover:-translate-y-1 transition-all duration-300 flex flex-col items-center gap-4">
+                        <span class="text-3xl text-white group-hover:text-brandNeon transition-colors"><i class="fa-brands fa-instagram"></i></span>
+                        <div>
+                            <span class="block text-white font-bold uppercase text-xs tracking-widest">INSTAGRAM</span>
+                            <span data-editable="social-ig" class="text-gray-500 text-xs">@alfinanfahri</span>
+                        </div>
+                    </a>
+
+                    <a id="link-tt" href="#" class="group p-6 bg-brandGray border border-white/10 hover:border-brandNeon hover:-translate-y-1 transition-all duration-300 flex flex-col items-center gap-4">
+                        <span class="text-3xl text-white group-hover:text-brandNeon transition-colors"><i class="fa-brands fa-tiktok"></i></span>
+                        <div>
+                            <span class="block text-white font-bold uppercase text-xs tracking-widest">TIKTOK</span>
+                            <span data-editable="social-tt" class="text-gray-500 text-xs">@alfinanfahri</span>
+                        </div>
+                    </a>
+
+                    <a id="link-wa" href="https://wa.me/6281234567890" target="_blank" class="group p-6 bg-brandGray border border-white/10 hover:border-brandNeon hover:-translate-y-1 transition-all duration-300 flex flex-col items-center gap-4">
+                        <span class="text-3xl text-white group-hover:text-brandNeon transition-colors"><i class="fa-brands fa-whatsapp"></i></span>
+                        <div>
+                            <span class="block text-white font-bold uppercase text-xs tracking-widest">WHATSAPP</span>
+                            <span data-editable="social-wa" class="text-gray-500 text-xs">+62 812 3456 7890</span>
+                        </div>
+                    </a>
+
+                    <a id="link-mail" href="mailto:alfinanfahri@gmail.com" class="group p-6 bg-brandGray border border-white/10 hover:border-brandNeon hover:-translate-y-1 transition-all duration-300 flex flex-col items-center gap-4">
+                        <span class="text-3xl text-white group-hover:text-brandNeon transition-colors"><i class="fa-solid fa-envelope"></i></span>
+                        <div>
+                            <span class="block text-white font-bold uppercase text-xs tracking-widest">EMAIL Direct</span>
+                            <span data-editable="social-mail" class="text-gray-500 text-xs">alfinanfahri@gmail.com</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-12 bg-black border-t border-white/5 text-center text-sm text-gray-600">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <span data-editable="footer-title" class="font-display font-extrabold text-white text-lg tracking-widest">PORTOFOLIO ALFINANFAHRI // ARCHIVE</span>
+            <div class="flex gap-6 text-xs uppercase tracking-widest font-semibold">
+                <a href="#" class="hover:text-brandNeon transition-colors">Privacy Policy</a>
+                <a href="#" class="hover:text-brandNeon transition-colors">Back to top ↑</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- GOOGLE DRIVE STYLE IMAGE/VIDEO LIGHTBOX MODAL -->
+    <div id="lightbox-modal" class="fixed inset-0 z-[20000] flex flex-col justify-center items-center bg-black/95 opacity-0 pointer-events-none transition-all duration-300">
+        <!-- Close Button -->
+        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white hover:text-brandNeon text-3xl z-[20001] transition-transform hover:scale-110">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        
+        <!-- Navigation Buttons -->
+        <button onclick="prevLightbox()" class="absolute left-6 text-white hover:text-brandNeon text-3xl z-[20001] bg-black/50 p-4 rounded-full transition-all">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button onclick="nextLightbox()" class="absolute right-6 text-white hover:text-brandNeon text-3xl z-[20001] bg-black/50 p-4 rounded-full transition-all">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <!-- Image Viewport -->
+        <div id="lightbox-img-wrap" class="max-w-4xl max-h-[75vh] w-full h-full flex items-center justify-center p-4 sm:p-6 relative">
+            <img id="lightbox-img" src="" alt="View Detail" class="max-w-full max-h-full object-contain border border-white/10 shadow-[0_0_50px_rgba(0,255,102,0.15)]">
+        </div>
+
+        <!-- Video Viewport with CORS Fallback Container -->
+        <div id="lightbox-video-wrap" class="hidden w-full max-w-4xl px-4 sm:px-6 flex flex-col items-center">
+            
+            <!-- Native Video Element -->
+            <video id="lightbox-video" class="w-full max-h-[62vh] object-contain border border-white/10 shadow-[0_0_50px_rgba(0,255,102,0.2)]" preload="none"></video>
+            
+            <!-- Iframe Fallback Container -->
+            <div id="lightbox-iframe-wrap" class="hidden w-full aspect-video md:h-[62vh] bg-black border border-white/10 shadow-[0_0_50px_rgba(0,255,102,0.2)]">
+                <iframe id="lightbox-iframe" class="w-full h-full" src="" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+            </div>
+
+            <!-- Custom Help Warning on playback constraints -->
+            <div id="video-fallback-bar" class="hidden w-full mt-2 bg-brandPink/15 border border-brandPink/30 px-3 py-2 text-center text-xs text-brandPink">
+                <span>⚠️ Google Drive membatasi pemutaran langsung karena ukuran file atau otentikasi.</span>
+                <a id="video-direct-link" href="#" target="_blank" class="underline ml-1 font-bold hover:text-white">Buka di Tab Baru <i class="fa-solid fa-up-right-from-square text-[10px]"></i></a>
+            </div>
+
+            <!-- Custom Video Controls -->
+            <div id="video-controls" class="w-full mt-3 bg-black/80 backdrop-blur-sm border border-white/10 px-4 py-3 flex flex-col gap-2 rounded-lg">
+                <!-- Progress Bar / Seekable Duration Slider -->
+                <div class="flex items-center gap-3">
+                    <span id="video-current-time" class="text-brandNeon text-xs font-mono w-10 shrink-0 select-none">0:00</span>
+                    <div id="video-progress-wrap" class="flex-1 h-2 bg-white/10 rounded-full cursor-pointer relative group/bar" onclick="seekVideo(event)">
+                        <div id="video-progress-bar" class="h-full bg-brandNeon rounded-full transition-all pointer-events-none" style="width:0%"></div>
+                        <div id="video-progress-thumb" class="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-brandNeon rounded-full shadow opacity-0 group-hover/bar:opacity-100 transition-opacity pointer-events-none" style="left:0%"></div>
+                    </div>
+                    <span id="video-total-time" class="text-gray-400 text-xs font-mono w-10 shrink-0 text-right select-none">0:00</span>
+                </div>
+                <!-- Buttons -->
+                <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3 sm:gap-4 w-full">
+                    <button onclick="rewindVideo()" class="text-white hover:text-brandNeon transition-colors text-xs font-bold uppercase flex items-center gap-1 bg-white/5 py-1 px-2.5 rounded hover:bg-white/10" title="Mundur 10 detik">
+                        <i class="fa-solid fa-rotate-left"></i> -10s
+                    </button>
+                    <button id="video-play-btn" onclick="toggleVideoPlay()" class="w-10 h-10 rounded-full bg-brandNeon text-black flex items-center justify-center hover:bg-white transition-colors text-base font-extrabold shadow-lg">
+                        <i class="fa-solid fa-play" id="video-play-icon"></i>
+                    </button>
+                    <button onclick="forwardVideo()" class="text-white hover:text-brandNeon transition-colors text-xs font-bold uppercase flex items-center gap-1 bg-white/5 py-1 px-2.5 rounded hover:bg-white/10" title="Maju 10 detik">
+                        +10s <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+
+                    <!-- Speed controller -->
+                    <div class="flex items-center gap-1.5 ml-2">
+                        <span class="text-[10px] text-gray-500 font-bold uppercase select-none">SPEED:</span>
+                        <select id="video-speed" onchange="setVideoSpeed(this.value)" class="bg-brandDark border border-white/15 text-xs text-brandLight py-1 px-1.5 focus:outline-none focus:border-brandNeon rounded">
+                            <option value="0.5">0.5x</option>
+                            <option value="1" selected>1.0x</option>
+                            <option value="1.5">1.5x</option>
+                            <option value="2">2.0x</option>
+                        </select>
+                    </div>
+
+                    <!-- Volume controller -->
+                    <div class="flex items-center gap-2 ml-auto justify-end">
+                        <button onclick="toggleMuteVideo()" id="video-mute-btn" class="text-gray-400 hover:text-brandNeon transition-colors">
+                            <i class="fa-solid fa-volume-high" id="video-mute-icon"></i>
+                        </button>
+                        <input type="range" id="video-volume" min="0" max="1" step="0.05" value="1" oninput="setVideoVolume(this.value)" class="w-16 sm:w-20 accent-brandNeon cursor-pointer">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meta info of current viewed artwork -->
+        <div class="text-center mt-4 px-6 max-w-2xl select-none">
+            <h3 id="lightbox-title" class="font-display text-2xl md:text-3xl font-black text-white uppercase tracking-tight">KARYA ART</h3>
+            <p id="lightbox-desc" class="text-brandNeon text-sm tracking-wide mt-1 uppercase">DESKRIPSI KARYA</p>
+        </div>
+    </div>
+
+    <!-- INLINE ELEMENT BUILDER FLOATING TOOLBAR -->
+    <div id="inline-element-toolbar" class="hidden absolute z-[9999] bg-brandPink text-white border border-white flex divide-x divide-white/20 shadow-2xl transition-all duration-150 rounded-md overflow-hidden">
+        <button onclick="inlineMoveUp()" class="px-3 py-1.5 hover:bg-black text-[10px] font-black" title="Naikkan Elemen"><i class="fa-solid fa-arrow-up"></i></button>
+        <button onclick="inlineMoveDown()" class="px-3 py-1.5 hover:bg-black text-[10px] font-black" title="Turunkan Elemen"><i class="fa-solid fa-arrow-down"></i></button>
+        <button onclick="inlineInsertText('p')" class="px-3 py-1.5 hover:bg-black text-[10px] font-black" title="Tambah Paragraf Baru"><i class="fa-solid fa-paragraph"></i> +P</button>
+        <button onclick="inlineInsertText('h3')" class="px-3 py-1.5 hover:bg-black text-[10px] font-black" title="Tambah Subjudul Baru"><i class="fa-solid fa-heading"></i> +H3</button>
+        <button onclick="inlineDelete()" class="px-3 py-1.5 bg-black hover:bg-red-600 text-[10px] font-black text-brandNeon" title="Hapus Elemen Ini"><i class="fa-solid fa-trash"></i> HAPUS</button>
+    </div>
+
+    <!-- FLOATING VISUAL EDITOR CONTROLLER PANEL -->
+    <div id="editor-control-panel" class="fixed bottom-4 right-4 left-4 sm:left-auto sm:right-6 sm:bottom-6 z-[9999] flex flex-col gap-3 max-w-[calc(100vw-2rem)] sm:max-w-sm w-full sm:w-auto">
+        
+        <!-- Toggle Recovery Section list for hidden sections -->
+        <div id="restore-panel" class="hidden bg-brandDark/95 backdrop-blur-md border border-brandNeon p-4 shadow-[4px_4px_0px_0px_#00FF66] text-sm">
+            <p class="font-display font-black text-xs uppercase text-white tracking-wider mb-3">🛠️ Pemulihan Tata Letak</p>
+            <div id="section-toggles-list" class="space-y-2"></div>
+        </div>
+
+        <!-- Data Tools Panel -->
+        <div id="data-tools-panel" class="hidden bg-brandDark/95 backdrop-blur-md border border-brandPink p-4 shadow-[4px_4px_0px_0px_#FF0055] text-sm mb-2">
+            <p class="font-display font-black text-xs uppercase text-white tracking-wider mb-3">💾 Cadangan Data (JSON)</p>
+            <div class="flex flex-col gap-2">
+                <button onclick="exportData()" class="w-full text-left px-3 py-2 bg-brandPink text-white text-[10px] font-bold uppercase hover:bg-white hover:text-black transition-all">
+                    <i class="fa-solid fa-download mr-1"></i> Simpan Data ke File
+                </button>
+                <label class="w-full text-left px-3 py-2 bg-brandGray text-white text-[10px] font-bold uppercase cursor-pointer hover:bg-brandNeon hover:text-black transition-all">
+                    <i class="fa-solid fa-upload mr-1"></i> Load Backup Data
+                    <input type="file" id="import-data-file" onchange="importData(event)" class="hidden">
+                </label>
+            </div>
+        </div>
+
+        <!-- Floating Action Buttons -->
+        <div class="flex gap-2 self-end">
+            <!-- Data Tools Button -->
+            <button onclick="document.getElementById('data-tools-panel').classList.toggle('hidden')" id="editor-data-btn" class="hidden px-4 py-3 bg-brandGray text-white border border-white/20 font-extrabold text-xs uppercase rounded-full hover:bg-brandPink transition-all">
+                <i class="fa-solid fa-database"></i>
+            </button>
+            <!-- Recover layout button -->
+            <button onclick="toggleRestorePanel()" id="editor-restore-btn" class="hidden px-4 py-3 bg-brandGray text-white border border-white/20 font-extrabold text-xs uppercase rounded-full hover:bg-brandNeon hover:text-black transition-all">
+                <i class="fa-solid fa-layer-group"></i> Atur Sesi
+            </button>
+            <!-- Tombol Logout Admin -->
+            <button onclick="doAdminLogout()" id="editor-logout-btn" class="hidden px-4 py-3 bg-brandGray text-white border border-white/20 font-extrabold text-xs uppercase rounded-full hover:bg-brandPink transition-all" title="Keluar dari akun admin">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+            <!-- Floating Toggle Button (hanya tampak setelah login admin) -->
+            <button onclick="toggleEditMode()" id="editor-toggle" class="hidden items-center gap-2 px-5 py-4 bg-brandNeon text-black font-extrabold text-sm uppercase rounded-full shadow-[4px_4px_0px_0px_#FF0055] hover:bg-white transition-all">
+                <i id="editor-toggle-icon" class="fa-solid fa-wrench"></i> 
+                <span id="editor-toggle-text">Mode Edit: OFF</span>
+            </button>
+        </div>
+
+        <!-- Tombol Login Admin (kecil & diskret, untuk pengunjung publik) -->
+        <button onclick="openLoginModal()" id="admin-login-trigger" class="self-end w-9 h-9 flex items-center justify-center bg-brandDark/60 text-gray-500 border border-white/10 rounded-full hover:text-brandNeon hover:border-brandNeon transition-all" title="Login Admin">
+            <i class="fa-solid fa-lock text-xs"></i>
+        </button>
+
+        <!-- Floating Export Button -->
+        <button onclick="exportCleanWebsite()" id="editor-export-btn" class="hidden flex items-center justify-center gap-2 px-5 py-3 bg-brandPink text-white font-extrabold text-xs uppercase rounded-full shadow-[4px_4px_0px_0px_#FFF] hover:bg-white hover:text-black transition-all self-end">
+            <i class="fa-solid fa-download"></i> Unduh Website (.html)
+        </button>
+    </div>
+
+    <!-- ADMIN LOGIN MODAL -->
+    <div id="login-modal" class="fixed inset-0 z-[10001] flex items-center justify-center bg-black/85 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300 px-6">
+        <div class="bg-brandDark border border-brandNeon max-w-sm w-full p-8 relative">
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-white hover:text-brandNeon">
+                <i class="fa-solid fa-xmark text-2xl"></i>
+            </button>
+            <h3 class="font-display text-2xl font-black uppercase text-white mb-2">LOGIN ADMIN</h3>
+            <p class="text-gray-500 text-xs mb-6 uppercase tracking-wider">Hanya pemilik situs yang bisa masuk ke mode edit</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs uppercase tracking-wider font-semibold text-gray-400 mb-2">Email</label>
+                    <input type="email" id="login-email-input" class="w-full bg-brandGray border border-white/10 focus:border-brandNeon text-white px-4 py-3 text-sm focus:outline-none transition-colors">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase tracking-wider font-semibold text-gray-400 mb-2">Password</label>
+                    <input type="password" id="login-password-input" class="w-full bg-brandGray border border-white/10 focus:border-brandNeon text-white px-4 py-3 text-sm focus:outline-none transition-colors" onkeydown="if(event.key==='Enter') doAdminLogin();">
+                </div>
+                <p id="login-error-msg" class="hidden text-brandPink text-xs uppercase tracking-wider"></p>
+                <button onclick="doAdminLogin()" class="w-full py-3 bg-brandNeon text-black font-semibold text-xs uppercase tracking-wider hover:bg-white transition-colors">
+                    MASUK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROJECT MANAGEMENT MODAL -->
+    <div id="project-modal" class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/85 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300 px-6">
+        <div class="bg-brandDark border border-brandNeon max-w-md w-full p-8 relative">
+            <button onclick="closeProjectModal()" class="absolute top-4 right-4 text-white hover:text-brandNeon">
+                <i class="fa-solid fa-xmark text-2xl"></i>
+            </button>
+            <h3 id="modal-title" class="font-display text-2xl font-black uppercase text-white mb-2">EDIT KARYA</h3>
+            <p class="text-gray-500 text-xs mb-6 uppercase tracking-wider">Silahkan ganti detail karya seni & link gambar/video kamu</p>
+            
+            <input type="hidden" id="edit-project-id">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs uppercase tracking-wider font-semibold text-gray-400 mb-2">Nama Karya</label>
+                    <input type="text" id="project-title-input" class="w-full bg-brandGray border border-white/10 focus:border-brandNeon text-white px-4 py-3 text-sm focus:outline-none transition-colors">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase tracking-wider font-semibold text-gray-400 mb-2">Tipe / Kategori Deskripsi</label>
+                    <input type="text" id="project-desc-input" class="w-full bg-brandGray border border-white/10 focus:border-brandNeon text-white px-4 py-3 text-sm focus:outline-none transition-colors">
+                </div>
+                <div>
+                    <label class="block text-xs uppercase tracking-wider font-semibold text-gray-400 mb-2">Kategori Filter</label>
+                    <select id="project-category-input" class="w-full bg-brandGray border border-white/10 focus:border-brandNeon text-white px-4 py-3 text-sm focus:outline-none transition-colors">
+                        <option value="apparel">APPAREL</option>
+                        <option value="visual design">VISUAL DESIGN</option>
+                        <option value="vector">VECTOR / ILLUSTRATION</option>
+                        <option value="photo">PHOTO</option>
+                        <option value="video">VIDEO</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs uppercase tracking-wider font-semibold text-gray-400 mb-2">Gambar / Video / GIF</label>
+                    <div id="upload-dropzone" class="w-full border-2 border-dashed border-white/20 hover:border-brandNeon bg-brandGray/50 px-4 py-6 text-center cursor-pointer transition-colors"
+                         ondragover="event.preventDefault(); this.classList.add('drag-hover');"
+                         ondragleave="this.classList.remove('drag-hover');"
+                         ondrop="handleFileDrop(event)"
+                         onclick="document.getElementById('project-file-input').click()">
+                        <i class="fa-solid fa-cloud-arrow-up text-2xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-400 text-xs uppercase tracking-wider">Seret file ke sini atau klik untuk pilih</p>
+                        <p class="text-gray-600 text-[10px] mt-1">Mendukung gambar, video, dan GIF</p>
+                    </div>
+                    <input type="file" id="project-file-input" accept="image/*,video/*" class="hidden" onchange="handleFileSelect(event)">
+                    <div id="upload-progress-wrap" class="hidden mt-2">
+                        <div class="w-full h-1.5 bg-brandGray"><div id="upload-progress-bar" class="h-1.5 bg-brandNeon" style="width:0%"></div></div>
+                        <p id="upload-progress-text" class="text-gray-500 text-[10px] mt-1 uppercase">Mengunggah...</p>
+                    </div>
+                    <div id="upload-preview-wrap" class="hidden mt-3 flex items-center gap-3">
+                        <img id="upload-preview-img" class="hidden w-16 h-16 object-cover border border-white/10">
+                        <video id="upload-preview-video" class="hidden w-16 h-16 object-cover border border-white/10" muted></video>
+                        <p class="text-gray-400 text-[10px] truncate flex-1">File terpilih, siap disimpan.</p>
+                    </div>
+                    <input type="hidden" id="project-img-input">
+                    <input type="hidden" id="project-media-type-input" value="image">
+                    <p class="text-gray-600 text-[10px] mt-1 leading-normal">Link Google Drive lama tetap berfungsi untuk karya yang sudah ada.</p>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button id="delete-project-btn" onclick="deleteCurrentProject()" class="w-1/3 py-3 bg-red-600 hover:bg-red-800 text-white font-semibold text-xs uppercase tracking-wider transition-colors">
+                        HAPUS
+                    </button>
+                    <button onclick="saveProjectData()" class="w-2/3 py-3 bg-brandNeon text-black font-semibold text-xs uppercase tracking-wider hover:bg-white transition-colors">
+                        SIMPAN PERUBAHAN
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM TOAST NOTIFICATION CONTAINER -->
+    <div id="custom-toast" class="fixed bottom-6 left-6 z-[30000] px-6 py-4 font-bold text-xs uppercase tracking-widest border transition-all duration-300 transform translate-y-10 opacity-0 pointer-events-none"></div>
+
+    <!-- CUSTOM CONFIRMATION DIALOG MODAL -->
+    <div id="custom-confirm-modal" class="fixed inset-0 z-[31000] flex items-center justify-center bg-black/90 opacity-0 pointer-events-none transition-all duration-300 hidden px-6">
+        <div class="bg-brandDark border border-brandPink max-w-sm w-full p-6 text-center shadow-[0_0_50px_rgba(255,0,85,0.15)]">
+            <div class="text-brandPink text-3xl mb-4"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h4 class="font-display text-lg font-black uppercase text-white mb-2">KONFIRMASI TINDAKAN</h4>
+            <p id="confirm-message" class="text-gray-400 text-sm mb-6 uppercase tracking-wider">Apakah Anda yakin ingin melakukan tindakan ini?</p>
+            <div class="flex gap-3">
+                <button id="confirm-no-btn" class="w-1/2 py-2 bg-brandGray border border-white/10 text-white font-bold text-xs uppercase tracking-wider hover:border-white transition-colors">
+                    BATAL
+                </button>
+                <button id="confirm-yes-btn" class="w-1/2 py-2 bg-brandPink text-white font-bold text-xs uppercase tracking-wider hover:bg-white hover:text-black transition-colors">
+                    YA, PROSES
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Script Logic with Embedded CMS -->
+    <script>
+        // --- MOBILE MENU LOGIC ---
+        const menuBtn = document.getElementById('menu-btn');
+        const closeBtn = document.getElementById('close-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.remove('translate-x-full');
+        });
+
+        closeBtn.addEventListener('click', () => {
+            mobileMenu.classList.add('translate-x-full');
+        });
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('translate-x-full');
+            });
+        });
+
+        // --- GSAP ANIMATION ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Hero section animations
+            gsap.from('h1', { duration: 1.2, y: 100, opacity: 0, ease: 'power4.out', delay: 0.2 });
+            gsap.from('p', { duration: 1, y: 50, opacity: 0, ease: 'power3.out', delay: 0.5 });
+
+            await Promise.all([loadProjects(), loadSiteSettings()]);
+
+            applySectionLayout();
+            renderGallery();
+            applyTextContent();
+            initInlineTools();
+            await checkAdminSession();
+        });
+
+        // --- DATABASE PROJECT (Diambil dari Supabase, bukan localStorage lagi) ---
+        let projects = [];
+        const DEMO_PROJECTS = [
+            { id: 1, title: "STREETWEAR PARKA FILM v1", category: "video", desc: "Sampel video visual sinematik", img: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", media_type: "video", sort_order: 1 },
+            { id: 2, title: "GLITCH DESIGN poster", category: "visual design", desc: "Asymmetrical street art banner layout", img: "https://images.unsplash.com/photo-1509281373149-e957c6296406?q=80&w=600&auto=format&fit=crop", media_type: "image", sort_order: 2 },
+            { id: 3, title: "OVERSIZED ACID TEE", category: "apparel", desc: "Washed heavyweight drop mockup", img: "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?q=80&w=600&auto=format&fit=crop", media_type: "image", sort_order: 3 }
+        ];
+
+        // Ambil daftar project dari Supabase (atau data demo jika belum dikonfigurasi)
+        async function loadProjects() {
+            if (!SUPABASE_CONFIGURED) {
+                projects = DEMO_PROJECTS;
+                showToast("Supabase belum dikonfigurasi — menampilkan data demo", "pink");
+                return;
+            }
+            const { data, error } = await sb.from('projects').select('*').order('sort_order', { ascending: true });
+            if (error) {
+                console.error(error);
+                showToast("Gagal memuat data project dari server", "pink");
+                projects = [];
+                return;
+            }
+            projects = data || [];
+        }
+
+        // --- CUSTOM TOAST AND CONFIRMATION IMPLEMENTATIONS ---
+        function showToast(message, type = 'neon') {
+            const toast = document.getElementById('custom-toast');
+            toast.innerText = message;
+            
+            toast.className = `fixed bottom-6 left-6 z-[30000] px-6 py-4 font-bold text-xs uppercase tracking-widest border transition-all duration-300 transform translate-y-10 opacity-0 pointer-events-none rounded`;
+            
+            if (type === 'pink') {
+                toast.classList.add('bg-brandDark', 'border-brandPink', 'text-brandPink', 'shadow-[4px_4px_0px_0px_#FF0055]');
+            } else {
+                toast.classList.add('bg-brandDark', 'border-brandNeon', 'text-brandNeon', 'shadow-[4px_4px_0px_0px_#00FF66]');
+            }
+            
+            toast.classList.remove('translate-y-10', 'opacity-0', 'pointer-events-none');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        function showCustomConfirm(message, onConfirm) {
+            const modal = document.getElementById('custom-confirm-modal');
+            const msgEl = document.getElementById('confirm-message');
+            msgEl.innerText = message;
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+            }, 50);
+
+            const confirmBtn = document.getElementById('confirm-yes-btn');
+            const cancelBtn = document.getElementById('confirm-no-btn');
+
+            const removeEvents = () => {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+                confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+                cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+            };
+
+            document.getElementById('confirm-yes-btn').addEventListener('click', () => {
+                onConfirm();
+                removeEvents();
+            });
+
+            document.getElementById('confirm-no-btn').addEventListener('click', () => {
+                removeEvents();
+            });
+        }
+
+        // --- DYNAMIC TYPE AND EXTENSION VIDEO RECOGNITION (FIXED ERROR ON IMAGE DETECTIONS) ---
+        function isVideoProject(project) {
+            if (!project || !project.img) return false;
+            
+            if (project.category === 'video') return true;
+            
+            const lower = project.img.toLowerCase();
+            if (lower.match(/\.(mp4|webm|ogg|mov|m4v|3gp|flv|avi|wmv|mpeg|mpg|ts)(\?|$)/)) {
+                return true;
+            }
+            return false;
+        }
+
+        // --- FIXED GOOGLE DRIVE RAW LINK PARSER FOR MULTIPLE FILETYPES ---
+        function cleanGoogleDriveUrl(url, category) {
+            if (!url) return '';
+            const driveId = getGoogleDriveId(url);
+            if (driveId) {
+                if (category === 'video') {
+                    return `https://docs.google.com/uc?export=download&id=${driveId}`;
+                } else {
+                    return `https://drive.google.com/thumbnail?id=${driveId}&sz=w1000`;
+                }
+            }
+            return url;
+        }
+
+        function getGoogleDriveId(url) {
+            if (!url) return null;
+            const regExp = /\/file\/d\/([a-zA-Z0-9_-]+)|[?&]id=([a-zA-Z0-9_-]+)/;
+            const matches = url.match(regExp);
+            if (matches) {
+                return matches[1] || matches[2];
+            }
+            return null;
+        }
+
+        // --- STREAMING_CHUNK: Processing gallery grid dynamic video frame elements ---
+        // --- RENDERING GALLERY GRID WITH DRAG & DROP EVENT BINDING ---
+        function renderGallery() {
+            const grid = document.getElementById('gallery-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            projects.forEach(project => {
+                const card = document.createElement('div');
+                card.className = `project-card group overflow-hidden relative border border-white/10 bg-brandDark p-4 transition-all duration-300 break-inside-avoid inline-block w-full mb-8 cursor-pointer`;
+                card.setAttribute('data-category', project.category);
+                card.setAttribute('data-id', project.id);
+                
+                card.setAttribute('onclick', `handleProjectClick(${project.id})`);
+                
+                card.draggable = isEditing;
+                card.setAttribute('ondragstart', `handleDragStart(event, ${project.id})`);
+                card.setAttribute('ondragover', `handleDragOver(event)`);
+                card.setAttribute('ondragenter', `handleDragEnter(event)`);
+                card.setAttribute('ondragleave', `handleDragLeave(event)`);
+                card.setAttribute('ondrop', `handleDrop(event, ${project.id})`);
+                card.setAttribute('ondragend', `handleDragEnd(event)`);
+
+                const isVid = isVideoProject(project);
+                
+                // Element HTML Utama Media (Video Dinamis dengan hover playback & freeze detik ke-1 VS Gambar Statis)
+                const mediaElementHtml = isVid ? `
+                    <div class="relative w-full aspect-video overflow-hidden bg-neutral-950 mb-4 pointer-events-none">
+                        <video src="${cleanGoogleDriveUrl(project.img, 'video')}#t=1" 
+                               preload="metadata" muted playsinline loop
+                               class="w-full h-full object-cover block group-hover:scale-105 transition-transform duration-500"
+                               onloadedmetadata="this.currentTime=1"
+                               onmouseenter="this.play().catch(e=>{})"
+                               onmouseleave="this.pause(); this.currentTime=1;">
+                        </video>
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div class="w-12 h-12 rounded-full bg-black/80 border-2 border-brandNeon flex items-center justify-center text-brandNeon text-xl group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-play ml-0.5"></i>
+                            </div>
+                        </div>
+                        <div class="absolute inset-0 bg-brandNeon/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </div>
+                ` : `
+                    <div class="relative w-full overflow-hidden bg-neutral-950 mb-4 pointer-events-none">
+                        <img src="${cleanGoogleDriveUrl(project.img, project.category)}" 
+                             alt="${project.title}" 
+                             onerror="this.src='https://images.unsplash.com/photo-1578587018452-892bacefd3f2?q=80&w=600&auto=format&fit=crop'"
+                             class="w-full h-auto block group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-brandNeon/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </div>
+                `;
+
+                card.innerHTML = `
+                    ${mediaElementHtml}
+                    <div class="flex justify-between items-center pointer-events-none">
+                        <div class="min-w-0 flex-1">
+                            <h3 class="font-display font-bold uppercase text-white group-hover:text-brandNeon transition-colors truncate project-card-title">${project.title}</h3>
+                            <p class="text-gray-500 truncate project-card-desc">${project.desc}</p>
+                        </div>
+                        ${isVid ? `<span class="ml-2 shrink-0 text-[10px] font-bold uppercase tracking-wider bg-brandNeon text-black px-2 py-0.5">VIDEO</span>` : ''}
+                    </div>
+                `;
+
+                // Aktifkan auto-play preview hover jika di luar mode edit
+                if (!isEditing && isVid) {
+                    card.removeAttribute('onmouseenter');
+                    card.removeAttribute('onmouseleave');
+                    card.addEventListener('mouseenter', () => {
+                        const vid = card.querySelector('video');
+                        if (vid) vid.play().catch(err => {});
+                    });
+                    card.addEventListener('mouseleave', () => {
+                        const vid = card.querySelector('video');
+                        if (vid) {
+                            vid.pause();
+                            vid.currentTime = 1;
+                        }
+                    });
+                }
+
+                grid.appendChild(card);
+            });
+            
+            const slider = document.getElementById('portfolioScaleSlider');
+            if(slider && typeof applyGalleryScale === 'function') applyGalleryScale(parseInt(slider.value));
+        }
+
+        // --- HTML5 DRAG & DROP REORDERING ENGINE ---
+        let draggedCardId = null;
+
+        function handleDragStart(e, id) {
+            if (!isEditing) return;
+            draggedCardId = id;
+            e.dataTransfer.effectAllowed = 'move';
+            e.currentTarget.classList.add('opacity-50');
+        }
+
+        function handleDragOver(e) {
+            if (!isEditing) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleDragEnter(e) {
+            if (!isEditing) return;
+            e.currentTarget.classList.add('drag-hover');
+        }
+
+        function handleDragLeave(e) {
+            if (!isEditing) return;
+            e.currentTarget.classList.remove('drag-hover');
+        }
+
+        function handleDrop(e, targetId) {
+            if (!isEditing) return;
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-hover');
+            
+            if (draggedCardId === targetId) return;
+
+            const draggedIdx = projects.findIndex(p => p.id === draggedCardId);
+            const targetIdx = projects.findIndex(p => p.id === targetId);
+
+            if (draggedIdx !== -1 && targetIdx !== -1) {
+                const temp = projects[draggedIdx];
+                projects.splice(draggedIdx, 1);
+                projects.splice(targetIdx, 0, temp);
+
+                renderGallery();
+                enableEditableElements(true);
+                persistProjectOrder();
+            }
+        }
+
+        // Simpan urutan baru (sort_order) ke Supabase untuk semua project
+        async function persistProjectOrder() {
+            if (!SUPABASE_CONFIGURED) return;
+            const updates = projects.map((p, idx) => sb.from('projects').update({ sort_order: idx + 1 }).eq('id', p.id));
+            const results = await Promise.all(updates);
+            const failed = results.find(r => r.error);
+            if (failed) { console.error(failed.error); showToast("Gagal menyimpan urutan ke server", "pink"); }
+        }
+
+        function handleDragEnd(e) {
+            e.currentTarget.classList.remove('opacity-50');
+            document.querySelectorAll('.project-card').forEach(card => card.classList.remove('drag-hover'));
+        }
+
+        // --- FILTER GALLERY ---
+        function filterGallery(category) {
+            const cards = document.querySelectorAll('.project-card');
+            const buttons = document.querySelectorAll('.filter-btn');
+
+            buttons.forEach(btn => {
+                btn.classList.remove('active', 'border-brandNeon', 'bg-brandNeon', 'text-black');
+                btn.classList.add('border-white/10', 'text-white');
+            });
+
+            if (event && event.target) {
+                event.target.classList.add('active', 'border-brandNeon', 'bg-brandNeon', 'text-black');
+                event.target.classList.remove('border-white/10', 'text-white');
+            }
+
+            cards.forEach(card => {
+                const cardCategory = card.getAttribute('data-category');
+                if (category === 'all' || cardCategory === category) {
+                    card.style.display = 'inline-block';
+                    gsap.fromTo(card, { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: 'power2.out' });
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // --- STREAMING_CHUNK: Lightbox and native seekable elements config ---
+        // --- CUSTOM GOOGLE DRIVE LIGHTBOX SYSTEM (REPAIRED BUGS ON AUTOPLAY & MULTIPLE CLICKS) ---
+        let currentLightboxIndex = 0;
+
+        function openLightbox(index) {
+            currentLightboxIndex = index;
+            const project = projects[currentLightboxIndex];
+            if (!project) return;
+
+            const modal = document.getElementById('lightbox-modal');
+            const imgWrap = document.getElementById('lightbox-img-wrap');
+            const videoWrap = document.getElementById('lightbox-video-wrap');
+            const img = document.getElementById('lightbox-img');
+            
+            const video = document.getElementById('lightbox-video');
+            const iframeWrap = document.getElementById('lightbox-iframe-wrap');
+            const iframe = document.getElementById('lightbox-iframe');
+            const videoControls = document.getElementById('video-controls');
+            const videoFallbackBar = document.getElementById('video-fallback-bar');
+            
+            const title = document.getElementById('lightbox-title');
+            const desc = document.getElementById('lightbox-desc');
+
+            title.innerText = project.title;
+            desc.innerText = project.desc;
+
+            video.pause();
+            video.src = '';
+            if (video.load) {
+                try { video.load(); } catch(e) {}
+            }
+            iframe.src = '';
+            
+            iframeWrap.classList.add('hidden');
+            video.classList.remove('hidden');
+            videoControls.classList.remove('hidden');
+            videoFallbackBar.classList.add('hidden');
+
+            if (isVideoProject(project)) {
+                imgWrap.classList.add('hidden');
+                videoWrap.classList.remove('hidden');
+
+                const driveId = getGoogleDriveId(project.img);
+                if (driveId) {
+                    const streamUrl = `https://docs.google.com/uc?export=download&id=${driveId}`;
+                    video.src = streamUrl;
+                    
+                    video.onerror = function() {
+                        video.classList.add('hidden');
+                        videoControls.classList.add('hidden');
+                        
+                        iframeWrap.classList.remove('hidden');
+                        iframe.src = `https://drive.google.com/file/d/${driveId}/preview`;
+                        
+                        videoFallbackBar.classList.remove('hidden');
+                        document.getElementById('video-direct-link').href = project.img;
+                    };
+
+                    video.load();
+                    video.play().catch(e => {
+                        console.log("Autoplay caught safely: ", e.message);
+                    });
+                } else {
+                    video.src = project.img;
+                    video.onerror = function() {
+                        videoFallbackBar.classList.remove('hidden');
+                        document.getElementById('video-direct-link').href = project.img;
+                    };
+                    video.load();
+                    video.play().catch(e => {
+                        console.log("Autoplay caught safely: ", e.message);
+                    });
+                }
+
+                document.getElementById('video-play-icon').className = 'fa-solid fa-pause';
+            } else {
+                imgWrap.classList.remove('hidden');
+                videoWrap.classList.add('hidden');
+                
+                img.src = cleanGoogleDriveUrl(project.img, project.category);
+                gsap.fromTo(img, { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: 'power2.out' });
+            }
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeLightbox() {
+            const modal = document.getElementById('lightbox-modal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            
+            const video = document.getElementById('lightbox-video');
+            video.pause();
+            video.src = '';
+            
+            const iframe = document.getElementById('lightbox-iframe');
+            iframe.src = '';
+        }
+
+        // --- CUSTOM VIDEO PLAYER EVENTS ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('lightbox-video');
+            if (!video) return;
+
+            video.addEventListener('timeupdate', function() {
+                const pct = video.duration ? (video.currentTime / video.duration) * 100 : 0;
+                document.getElementById('video-progress-bar').style.width = pct + '%';
+                document.getElementById('video-progress-thumb').style.left = pct + '%';
+                document.getElementById('video-current-time').textContent = formatTime(video.currentTime);
+            });
+
+            video.addEventListener('loadedmetadata', function() {
+                document.getElementById('video-total-time').textContent = formatTime(video.duration);
+            });
+
+            video.addEventListener('ended', function() {
+                document.getElementById('video-play-icon').className = 'fa-solid fa-play';
+            });
+            video.addEventListener('play', function() {
+                document.getElementById('video-play-icon').className = 'fa-solid fa-pause';
+            });
+            video.addEventListener('pause', function() {
+                document.getElementById('video-play-icon').className = 'fa-solid fa-play';
+            });
+        });
+
+        function formatTime(sec) {
+            if (isNaN(sec)) return '0:00';
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60);
+            return m + ':' + (s < 10 ? '0' : '') + s;
+        }
+
+        function toggleVideoPlay() {
+            const video = document.getElementById('lightbox-video');
+            if (video.paused) { 
+                video.play().catch(e => console.log("Play failed: ", e.message)); 
+            } else { 
+                video.pause(); 
+            }
+        }
+
+        function seekVideo(e) {
+            const video = document.getElementById('lightbox-video');
+            const bar = document.getElementById('video-progress-wrap');
+            const rect = bar.getBoundingClientRect();
+            const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+            if (video.duration) video.currentTime = ratio * video.duration;
+        }
+
+        function rewindVideo() {
+            const video = document.getElementById('lightbox-video');
+            video.currentTime = Math.max(0, video.currentTime - 10);
+        }
+
+        function forwardVideo() {
+            const video = document.getElementById('lightbox-video');
+            video.currentTime = Math.min(video.duration || 0, video.currentTime + 10);
+        }
+
+        function setVideoVolume(val) {
+            const video = document.getElementById('lightbox-video');
+            video.volume = parseFloat(val);
+            video.muted = (parseFloat(val) === 0);
+            updateVolumeIcon(video.muted);
+        }
+
+        function setVideoSpeed(rate) {
+            document.getElementById('lightbox-video').playbackRate = parseFloat(rate);
+        }
+
+        function toggleMuteVideo() {
+            const video = document.getElementById('lightbox-video');
+            video.muted = !video.muted;
+            updateVolumeIcon(video.muted);
+            document.getElementById('video-volume').value = video.muted ? 0 : video.volume;
+        }
+
+        function updateVolumeIcon(muted) {
+            const icon = document.getElementById('video-mute-icon');
+            if (muted) {
+                icon.className = 'fa-solid fa-volume-xmark text-brandPink';
+            } else {
+                icon.className = 'fa-solid fa-volume-high text-gray-400';
+            }
+        }
+
+        function prevLightbox() {
+            let nextIdx = currentLightboxIndex - 1;
+            if (nextIdx < 0) nextIdx = projects.length - 1;
+            openLightbox(nextIdx);
+        }
+
+        function nextLightbox() {
+            let nextIdx = currentLightboxIndex + 1;
+            if (nextIdx >= projects.length) nextIdx = 0;
+            openLightbox(nextIdx);
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowRight' && !document.getElementById('lightbox-modal').classList.contains('pointer-events-none')) nextLightbox();
+            if (e.key === 'ArrowLeft' && !document.getElementById('lightbox-modal').classList.contains('pointer-events-none')) prevLightbox();
+        });
+
+        // --- HANDLER: CLICK ON PORTFOLIO CARD ---
+        function handleProjectClick(id) {
+            const index = projects.findIndex(p => p.id === id);
+            if (isEditing) {
+                const project = projects[index];
+                if (!project) return;
+
+                document.getElementById('edit-project-id').value = project.id;
+                document.getElementById('project-title-input').value = project.title;
+                document.getElementById('project-desc-input').value = project.desc;
+                document.getElementById('project-category-input').value = project.category;
+                document.getElementById('project-img-input').value = project.img;
+                document.getElementById('project-media-type-input').value = project.media_type || (isVideoProject(project) ? 'video' : 'image');
+                resetUploadDropzone();
+                
+                document.getElementById('modal-title').innerText = "EDIT DETAIL KARYA";
+                document.getElementById('delete-project-btn').classList.remove('hidden');
+                
+                openProjectModal();
+            } else {
+                openLightbox(index);
+            }
+        }
+
+        // --- STREAMING_CHUNK: Managing inline tools and paragraph inserts ---
+        // --- UNLIMITED INLINE ELEMENT BUILDER ---
+        let activeHoveredElement = null;
+
+        function initInlineTools() {
+            const toolbar = document.getElementById('inline-element-toolbar');
+
+            document.addEventListener('mouseover', (e) => {
+                if (!isEditing) return;
+
+                const target = e.target.closest('[data-editable]');
+                if (target && target.id !== 'brand-logo') {
+                    activeHoveredElement = target;
+                    positionInlineToolbar(target);
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!isEditing) return;
+                if (!e.target.closest('[data-editable]') && !e.target.closest('#inline-element-toolbar')) {
+                    toolbar.classList.add('hidden');
+                }
+            });
+        }
+
+        function positionInlineToolbar(element) {
+            const toolbar = document.getElementById('inline-element-toolbar');
+            const rect = element.getBoundingClientRect();
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+            toolbar.classList.remove('hidden');
+            toolbar.style.top = `${rect.top + scrollTop - toolbar.offsetHeight - 8}px`;
+            toolbar.style.left = `${rect.left}px`;
+        }
+
+        function inlineMoveUp() {
+            if (!activeHoveredElement) return;
+            const prev = activeHoveredElement.previousElementSibling;
+            if (prev) {
+                activeHoveredElement.parentNode.insertBefore(activeHoveredElement, prev);
+                positionInlineToolbar(activeHoveredElement);
+                saveAllTextContent();
+            }
+        }
+
+        function inlineMoveDown() {
+            if (!activeHoveredElement) return;
+            const next = activeHoveredElement.nextElementSibling;
+            if (next) {
+                activeHoveredElement.parentNode.insertBefore(next, activeHoveredElement);
+                positionInlineToolbar(activeHoveredElement);
+                saveAllTextContent();
+            }
+        }
+
+        function inlineDelete() {
+            if (!activeHoveredElement) return;
+            showCustomConfirm("Apakah kamu yakin ingin menghapus elemen teks ini secara permanen?", () => {
+                activeHoveredElement.remove();
+                document.getElementById('inline-element-toolbar').classList.add('hidden');
+                activeHoveredElement = null;
+                saveAllTextContent();
+                showToast("Elemen teks berhasil dihapus!", "pink");
+            });
+        }
+
+        function inlineInsertText(type) {
+            if (!activeHoveredElement) return;
+            
+            const newEl = document.createElement(type);
+            const randomId = 'editable-item-' + Date.now();
+            newEl.setAttribute('data-editable', randomId);
+            newEl.contentEditable = "true";
+            newEl.className = "edit-highlight font-sans text-gray-400 my-4 block";
+            
+            if (type === 'h3') {
+                newEl.className = "font-display text-2xl font-bold uppercase text-white my-4 block edit-highlight";
+                newEl.innerText = "SUB-JUDUL BARU";
+            } else {
+                newEl.innerText = "Paragraf baru. Klik disini untuk mengubah tulisan sesuka hatimu.";
+            }
+
+            activeHoveredElement.parentNode.insertBefore(newEl, activeHoveredElement.nextElementSibling);
+            saveAllTextContent();
+            
+            setTimeout(() => {
+                activeHoveredElement = newEl;
+                positionInlineToolbar(newEl);
+            }, 100);
+        }
+
+        // --- STREAMING_CHUNK: Setting edit mode transitions and control layouts ---
+        // --- VISUAL EDITOR CMS ENGINE & SECTION CONTROLLER ---
+        let isEditing = false;
+        let isAdminLoggedIn = false;
+
+        // Cek apakah sudah ada sesi login admin tersimpan (Supabase Auth)
+        async function checkAdminSession() {
+            if (!SUPABASE_CONFIGURED) return;
+            const { data } = await sb.auth.getSession();
+            isAdminLoggedIn = !!data.session;
+            updateEditorToggleVisibility();
+        }
+
+        function updateEditorToggleVisibility() {
+            const toggleBtn = document.getElementById('editor-toggle');
+            if (!toggleBtn) return;
+            // Tombol Mode Edit hanya tampak kalau sudah login sebagai admin
+            toggleBtn.classList.toggle('hidden', !isAdminLoggedIn);
+            const logoutBtn = document.getElementById('editor-logout-btn');
+            if (logoutBtn) logoutBtn.classList.toggle('hidden', !isAdminLoggedIn);
+            const loginTrigger = document.getElementById('admin-login-trigger');
+            if (loginTrigger) loginTrigger.classList.toggle('hidden', isAdminLoggedIn);
+            if (toggleBtn) toggleBtn.classList.toggle('flex', isAdminLoggedIn);
+        }
+
+        function openLoginModal() {
+            document.getElementById('login-error-msg').classList.add('hidden');
+            document.getElementById('login-modal').classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        async function doAdminLogin() {
+            if (!SUPABASE_CONFIGURED) { showToast("Supabase belum dikonfigurasi", "pink"); return; }
+            const email = document.getElementById('login-email-input').value;
+            const password = document.getElementById('login-password-input').value;
+            const errMsg = document.getElementById('login-error-msg');
+
+            const { error } = await sb.auth.signInWithPassword({ email, password });
+            if (error) {
+                errMsg.textContent = "Email atau password salah.";
+                errMsg.classList.remove('hidden');
+                return;
+            }
+            isAdminLoggedIn = true;
+            updateEditorToggleVisibility();
+            closeLoginModal();
+            showToast("Berhasil masuk sebagai admin!", "neon");
+        }
+
+        async function doAdminLogout() {
+            if (SUPABASE_CONFIGURED) await sb.auth.signOut();
+            isAdminLoggedIn = false;
+            if (isEditing) toggleEditMode(); // otomatis keluar dari mode edit juga
+            updateEditorToggleVisibility();
+            showToast("Berhasil keluar.", "pink");
+        }
+
+        function toggleEditMode() {
+            if (!isAdminLoggedIn && !isEditing) {
+                openLoginModal();
+                return;
+            }
+            isEditing = !isEditing;
+            const body = document.body;
+            const toggleButton = document.getElementById('editor-toggle');
+            const toggleText = document.getElementById('editor-toggle-text');
+            const toggleIcon = document.getElementById('editor-toggle-icon');
+            const banner = document.getElementById('editor-banner');
+            const addBtn = document.getElementById('add-project-btn');
+            const dragInstruction = document.getElementById('drag-instruction');
+            const exportBtn = document.getElementById('editor-export-btn');
+            const restoreBtn = document.getElementById('editor-restore-btn');
+            const restorePanel = document.getElementById('restore-panel');
+            const dataBtn = document.getElementById('editor-data-btn'); 
+            const inlineToolbar = document.getElementById('inline-element-toolbar');
+
+            if (isEditing) {
+                body.classList.add('pt-10'); 
+                banner.classList.remove('hidden');
+                addBtn.classList.remove('hidden');
+                dragInstruction.classList.remove('hidden');
+                exportBtn.classList.remove('hidden');
+                restoreBtn.classList.remove('hidden');
+                dataBtn.classList.remove('hidden'); 
+                toggleText.innerText = "Mode Edit: ON";
+                toggleButton.classList.remove('bg-brandNeon');
+                toggleButton.classList.add('bg-white');
+                toggleIcon.className = "fa-solid fa-square-check text-brandNeon";
+                enableEditableElements(true);
+            } else {
+                body.classList.remove('pt-10');
+                banner.classList.add('hidden');
+                addBtn.classList.add('hidden');
+                dragInstruction.classList.add('hidden');
+                exportBtn.classList.add('hidden');
+                restoreBtn.classList.add('hidden');
+                dataBtn.classList.add('hidden'); 
+                restorePanel.classList.add('hidden');
+                document.getElementById('data-tools-panel').classList.add('hidden'); 
+                inlineToolbar.classList.add('hidden');
+                toggleText.innerText = "Mode Edit: OFF";
+                toggleButton.classList.add('bg-brandNeon');
+                toggleButton.classList.remove('bg-white');
+                toggleIcon.className = "fa-solid fa-wrench";
+                enableEditableElements(false);
+                saveAllTextContent();
+            }
+        }
+
+        // --- IMPORT / EXPORT DATA ENGINE (Cadangan JSON dari/ke Supabase) ---
+        function exportData() {
+            if (!projects || projects.length === 0) { 
+                showToast("Tidak ada data untuk dicadangkan!", 'pink'); 
+                return; 
+            }
+            const blob = new Blob([JSON.stringify(projects, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'portfolio_data.json';
+            a.click();
+            showToast("Data cadangan berhasil diunduh!", "neon");
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    showCustomConfirm("Ini akan MENIMPA semua karya di server dengan isi file backup ini. Lanjutkan?", async () => {
+                        if (!SUPABASE_CONFIGURED) { showToast("Supabase belum dikonfigurasi", "pink"); return; }
+                        await sb.from('projects').delete().neq('id', 0); // hapus semua data lama
+                        const rows = data.map(({ id, ...rest }) => rest); // biarkan id auto-generate
+                        const { error } = await sb.from('projects').insert(rows);
+                        if (error) { console.error(error); showToast("Gagal memulihkan data ke server", "pink"); return; }
+                        showToast("Data berhasil dipulihkan ke server!", 'neon');
+                        setTimeout(() => window.location.reload(), 1000);
+                    });
+                } catch(err) {
+                    showToast("Gagal memuat file: Format JSON tidak valid.", 'pink');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function enableEditableElements(enable) {
+            const editables = document.querySelectorAll('[data-editable]');
+            editables.forEach(el => {
+                if (enable) {
+                    el.contentEditable = "true";
+                    el.classList.add('edit-highlight');
+                } else {
+                    el.contentEditable = "false";
+                    el.classList.remove('edit-highlight');
+                }
+            });
+
+            renderGallery();
+
+            const cards = document.querySelectorAll('.project-card');
+            cards.forEach(card => {
+                if (enable) {
+                    card.classList.add('outline', 'outline-2', 'outline-dashed', 'outline-brandPink', 'outline-offset-2');
+                } else {
+                    card.classList.remove('outline', 'outline-2', 'outline-dashed', 'outline-brandPink', 'outline-offset-2');
+                }
+            });
+
+            const toolbars = document.querySelectorAll('.section-editor-ui');
+            toolbars.forEach(tb => {
+                if (enable) {
+                    tb.classList.remove('hidden');
+                } else {
+                    tb.classList.add('hidden');
+                }
+            });
+        }
+
+        // --- MODULAR SECTION LAYOUT SHIFTING ENGINE ---
+        function moveSectionUp(sectionId) {
+            const section = document.getElementById(sectionId);
+            const previous = section.previousElementSibling;
+            if (previous && previous.tagName === 'SECTION') {
+                section.parentNode.insertBefore(section, previous);
+                saveSectionLayout();
+            }
+        }
+
+        function moveSectionDown(sectionId) {
+            const section = document.getElementById(sectionId);
+            const next = section.nextElementSibling;
+            if (next && next.tagName === 'SECTION') {
+                section.parentNode.insertBefore(next, section);
+                saveSectionLayout();
+            }
+        }
+
+        function deleteSection(sectionId) {
+            showCustomConfirm("Apakah kamu yakin ingin menyembunyikan bagian ini dari portofolio?", () => {
+                const section = document.getElementById(sectionId);
+                section.classList.add('hidden', 'hidden-section-state');
+                saveSectionLayout();
+                updateRestorePanel();
+                showToast("Layout disembunyikan!", "pink");
+            });
+        }
+
+        function toggleRestorePanel() {
+            const panel = document.getElementById('restore-panel');
+            panel.classList.toggle('hidden');
+            updateRestorePanel();
+        }
+
+        // --- SITE SETTINGS (Layout Section & Konten Teks) TERSIMPAN DI SUPABASE ---
+        let siteSettings = { section_layout: null, text_content: null };
+
+        async function loadSiteSettings() {
+            if (!SUPABASE_CONFIGURED) return;
+            const { data, error } = await sb.from('site_settings').select('*').eq('id', 1).maybeSingle();
+            if (error) { console.error(error); return; }
+            if (data) siteSettings = data;
+        }
+
+        async function saveSectionLayout() {
+            const container = document.getElementById('sections-container');
+            const order = Array.from(container.children).map(child => child.id);
+            const hidden = Array.from(container.children)
+                .filter(child => child.classList.contains('hidden-section-state'))
+                .map(child => child.id);
+
+            siteSettings.section_layout = { order, hidden };
+            if (!SUPABASE_CONFIGURED) return;
+            const { error } = await sb.from('site_settings').upsert({ id: 1, section_layout: siteSettings.section_layout });
+            if (error) { console.error(error); showToast("Gagal menyimpan layout ke server", "pink"); }
+        }
+
+        function applySectionLayout() {
+            const layout = siteSettings.section_layout;
+            if (!layout) return;
+
+            const container = document.getElementById('sections-container');
+            
+            layout.order.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) container.appendChild(el);
+            });
+
+            layout.hidden.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.add('hidden', 'hidden-section-state');
+                }
+            });
+        }
+
+        function updateRestorePanel() {
+            const container = document.getElementById('sections-container');
+            const listContainer = document.getElementById('section-toggles-list');
+            listContainer.innerHTML = '';
+
+            const sections = Array.from(container.children);
+            sections.forEach(sec => {
+                const id = sec.id;
+                const isHidden = sec.classList.contains('hidden-section-state');
+                
+                const item = document.createElement('div');
+                item.className = "flex items-center justify-between gap-4 py-1.5 border-b border-white/5";
+                item.innerHTML = `
+                    <span class="font-bold text-xs uppercase text-gray-400">${id.toUpperCase()}</span>
+                    <button onclick="toggleSectionVisibility('${id}')" class="px-2.5 py-1 ${isHidden ? 'bg-brandNeon text-black' : 'bg-brandPink text-white'} text-[10px] font-black uppercase transition-all">
+                        ${isHidden ? 'Tampilkan' : 'Sembunyikan'}
+                    </button>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
+        function toggleSectionVisibility(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('hidden-section-state')) {
+                el.classList.remove('hidden', 'hidden-section-state');
+            } else {
+                el.classList.add('hidden', 'hidden-section-state');
+            }
+            saveSectionLayout();
+            updateRestorePanel();
+        }
+
+        // --- PORTFOLIO ITEM CARD EDITING LOGIC ---
+        function openProjectModal() {
+            const modal = document.getElementById('project-modal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        function closeProjectModal() {
+            const modal = document.getElementById('project-modal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function openAddProjectModal() {
+            document.getElementById('edit-project-id').value = "new";
+            document.getElementById('project-title-input').value = "Nama Karya Baru";
+            document.getElementById('project-desc-input').value = "Detail Kategori / Mockup";
+            document.getElementById('project-category-input').value = "apparel";
+            document.getElementById('project-img-input').value = "";
+            document.getElementById('project-media-type-input').value = "image";
+            resetUploadDropzone();
+            
+            document.getElementById('modal-title').innerText = "TAMBAH KARYA BARU";
+            document.getElementById('delete-project-btn').classList.add('hidden'); 
+            
+            openProjectModal();
+        }
+
+        function resetUploadDropzone() {
+            selectedUploadFile = null;
+            document.getElementById('upload-preview-wrap').classList.add('hidden');
+            document.getElementById('upload-progress-wrap').classList.add('hidden');
+            document.getElementById('project-file-input').value = "";
+        }
+
+        // --- UPLOAD FILE (DRAG & DROP / KLIK) KE SUPABASE STORAGE ---
+        let selectedUploadFile = null;
+
+        function handleFileDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-hover');
+            const file = e.dataTransfer.files[0];
+            if (file) processSelectedFile(file);
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) processSelectedFile(file);
+        }
+
+        function processSelectedFile(file) {
+            selectedUploadFile = file;
+            const isVideo = file.type.startsWith('video/');
+            document.getElementById('project-media-type-input').value = isVideo ? 'video' : 'image';
+
+            const previewWrap = document.getElementById('upload-preview-wrap');
+            const imgPrev = document.getElementById('upload-preview-img');
+            const vidPrev = document.getElementById('upload-preview-video');
+            previewWrap.classList.remove('hidden');
+            const objUrl = URL.createObjectURL(file);
+            if (isVideo) {
+                vidPrev.src = objUrl; vidPrev.classList.remove('hidden'); imgPrev.classList.add('hidden');
+            } else {
+                imgPrev.src = objUrl; imgPrev.classList.remove('hidden'); vidPrev.classList.add('hidden');
+            }
+        }
+
+        async function uploadFileToStorage(file) {
+            if (!SUPABASE_CONFIGURED) {
+                showToast("Supabase belum dikonfigurasi, tidak bisa upload", "pink");
+                return null;
+            }
+            const progressWrap = document.getElementById('upload-progress-wrap');
+            const progressText = document.getElementById('upload-progress-text');
+            progressWrap.classList.remove('hidden');
+            progressText.textContent = "Mengunggah ke server...";
+
+            const ext = file.name.split('.').pop();
+            const path = `karya-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+            const { error } = await sb.storage.from('portfolio-media').upload(path, file, { upsert: false });
+            if (error) {
+                console.error(error);
+                progressWrap.classList.add('hidden');
+                showToast("Upload gagal: " + error.message, "pink");
+                return null;
+            }
+            const { data: pub } = sb.storage.from('portfolio-media').getPublicUrl(path);
+            progressWrap.classList.add('hidden');
+            return pub.publicUrl;
+        }
+
+        async function saveProjectData() {
+            if (!SUPABASE_CONFIGURED) { showToast("Supabase belum dikonfigurasi", "pink"); return; }
+
+            const idVal = document.getElementById('edit-project-id').value;
+            const titleVal = document.getElementById('project-title-input').value;
+            const descVal = document.getElementById('project-desc-input').value;
+            const catVal = document.getElementById('project-category-input').value;
+            let imgVal = document.getElementById('project-img-input').value;
+            let mediaType = document.getElementById('project-media-type-input').value;
+
+            // Jika ada file baru yang dipilih, upload dulu ke Storage
+            if (selectedUploadFile) {
+                const uploadedUrl = await uploadFileToStorage(selectedUploadFile);
+                if (!uploadedUrl) return; // upload gagal, hentikan
+                imgVal = uploadedUrl;
+            } else if (imgVal) {
+                imgVal = cleanGoogleDriveUrl(imgVal, catVal);
+            }
+
+            if (!imgVal) { showToast("Pilih atau unggah file media dulu", "pink"); return; }
+
+            if (idVal === "new") {
+                const newSortOrder = projects.length > 0 ? Math.max(...projects.map(p => p.sort_order || 0)) + 1 : 1;
+                const { data, error } = await sb.from('projects').insert({
+                    title: titleVal, desc: descVal, category: catVal, img: imgVal,
+                    media_type: mediaType, sort_order: newSortOrder
+                }).select();
+                if (error) { console.error(error); showToast("Gagal menyimpan ke server", "pink"); return; }
+                projects.push(data[0]);
+            } else {
+                const { data, error } = await sb.from('projects').update({
+                    title: titleVal, desc: descVal, category: catVal, img: imgVal, media_type: mediaType
+                }).eq('id', idVal).select();
+                if (error) { console.error(error); showToast("Gagal menyimpan ke server", "pink"); return; }
+                const idx = projects.findIndex(p => p.id == idVal);
+                if (idx !== -1) projects[idx] = data[0];
+            }
+
+            selectedUploadFile = null;
+            renderGallery();
+            closeProjectModal();
+            enableEditableElements(true); 
+            showToast("Karya berhasil disimpan!", "neon");
+        }
+
+        function deleteCurrentProject() {
+            showCustomConfirm("Apakah kamu yakin ingin menghapus karya ini?", async () => {
+                if (!SUPABASE_CONFIGURED) { showToast("Supabase belum dikonfigurasi", "pink"); return; }
+                const idVal = document.getElementById('edit-project-id').value;
+                const { error } = await sb.from('projects').delete().eq('id', idVal);
+                if (error) { console.error(error); showToast("Gagal menghapus di server", "pink"); return; }
+                projects = projects.filter(p => p.id != idVal);
+                renderGallery();
+                closeProjectModal();
+                enableEditableElements(true);
+                showToast("Karya berhasil dihapus!", "pink");
+            });
+        }
+
+        // --- SAVE/LOAD STATIC TEXT FIELDS (Supabase site_settings) ---
+        async function saveAllTextContent() {
+            const elements = document.querySelectorAll('[data-editable]');
+            const textDatabase = {};
+            elements.forEach(el => {
+                const key = el.getAttribute('data-editable');
+                textDatabase[key] = el.innerHTML;
+            });
+            siteSettings.text_content = textDatabase;
+            if (!SUPABASE_CONFIGURED) return;
+            const { error } = await sb.from('site_settings').upsert({ id: 1, text_content: textDatabase });
+            if (error) { console.error(error); showToast("Gagal menyimpan teks ke server", "pink"); }
+        }
+
+        function applyTextContent() {
+            const savedText = siteSettings.text_content;
+            if (!savedText) return;
+            
+            Object.keys(savedText).forEach(key => {
+                const el = document.querySelector(`[data-editable="${key}"]`);
+                if (el) {
+                    el.innerHTML = savedText[key];
+                }
+            });
+        }
+
+        // --- STREAMING_CHUNK: Structuring clean export engine for compiled files ---
+        // --- EXPORT COMPILATION ENGINE (WITH UPDATED AUTO-PARSING AND PLAYER DETECTIONS) ---
+        function exportCleanWebsite() {
+            const cloneDoc = document.documentElement.cloneNode(true);
+            
+            const cleanupSelectors = [
+                '#editor-control-panel',
+                '#editor-banner',
+                '#project-modal',
+                '#add-project-btn',
+                '#drag-instruction',
+                '#inline-element-toolbar',
+                '.section-editor-ui',
+                '#custom-toast',
+                '#custom-confirm-modal'
+            ];
+
+            cleanupSelectors.forEach(selector => {
+                cloneDoc.querySelectorAll(selector).forEach(el => el.remove());
+            });
+
+            const currentTextData = {};
+            const activeEditables = document.querySelectorAll('[data-editable]');
+            activeEditables.forEach(el => {
+                const key = el.getAttribute('data-editable');
+                currentTextData[key] = el.innerHTML;
+            });
+
+            const hiddenSections = cloneDoc.querySelectorAll('.hidden-section-state');
+            hiddenSections.forEach(sec => sec.remove());
+
+            const editables = cloneDoc.querySelectorAll('[data-editable]');
+            editables.forEach(el => {
+                const key = el.getAttribute('data-editable');
+                if (currentTextData[key]) {
+                    el.innerHTML = currentTextData[key];
+                }
+                el.removeAttribute('contenteditable');
+                el.classList.remove('edit-highlight');
+            });
+
+            const scriptStr = `
+                const projects = ${JSON.stringify(projects)};
+                const savedText = ${JSON.stringify(currentTextData)};
+            `;
+
+            const coreScript = `
+                document.addEventListener('DOMContentLoaded', () => {
+                    Object.keys(savedText).forEach(key => {
+                        const el = document.querySelector('[data-editable="' + key + '"]');
+                        if (el) el.innerHTML = savedText[key];
+                    });
+
+                    renderGallery();
+
+                    const menuBtn = document.getElementById('menu-btn');
+                    const closeBtn = document.getElementById('close-btn');
+                    const mobileMenu = document.getElementById('mobile-menu');
+                    const mobileLinks = document.querySelectorAll('.mobile-link');
+
+                    menuBtn.addEventListener('click', () => { mobileMenu.classList.remove('translate-x-full'); });
+                    closeBtn.addEventListener('click', () => { mobileMenu.classList.add('translate-x-full'); });
+                    mobileLinks.forEach(link => { link.addEventListener('click', () => { mobileMenu.classList.add('translate-x-full'); }); });
+                });
+
+                function getGoogleDriveId(url) {
+                    if (!url) return null;
+                    const regExp = /\\/file\\/d\\/([a-zA-Z0-9_-]+)|[?&]id=([a-zA-Z0-9_-]+)/;
+                    const matches = url.match(regExp);
+                    if (matches) {
+                        return matches[1] || matches[2];
+                    }
+                    return null;
+                }
+
+                function cleanGoogleDriveUrl(url, category) {
+                    if (!url) return '';
+                    const driveId = getGoogleDriveId(url);
+                    if (driveId) {
+                        if (category === 'video') {
+                            return 'https://docs.google.com/uc?export=download&id=' + driveId;
+                        } else {
+                            return 'https://drive.google.com/thumbnail?id=' + driveId + '&sz=w1000';
+                        }
+                    }
+                    return url;
+                }
+
+                function isVideoProject(project) {
+                    if (!project || !project.img) return false;
+                    if (project.category === 'video') return true;
+                    const lower = project.img.toLowerCase();
+                    return !!lower.match(/\\.(mp4|webm|ogg|mov|m4v|3gp|flv|avi|wmv|mpeg|mpg|ts)(\\?|$)/);
+                }
+
+                function renderGallery() {
+                    const grid = document.getElementById('gallery-grid');
+                    grid.innerHTML = '';
+                    projects.forEach((project, idx) => {
+                        const card = document.createElement('div');
+                        card.className = "project-card group overflow-hidden relative border border-white/10 bg-brandDark p-4 transition-all duration-300 break-inside-avoid inline-block w-full mb-8 cursor-pointer";
+                        card.setAttribute('data-category', project.category);
+                        card.setAttribute('onclick', 'openLightbox(' + idx + ')');
+                        
+                        const isVid = isVideoProject(project);
+
+                        const mediaHtml = isVid ? \`
+                            <div class="relative w-full aspect-video overflow-hidden bg-neutral-950 mb-4 pointer-events-none">
+                                <video src="\${cleanGoogleDriveUrl(project.img, 'video')}#t=1" 
+                                       preload="metadata" muted playsinline loop
+                                       class="w-full h-full object-cover block group-hover:scale-105 transition-transform duration-500"
+                                       onloadedmetadata="this.currentTime=1">
+                                </video>
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <div class="w-12 h-12 rounded-full bg-black/80 border-2 border-brandNeon flex items-center justify-center text-brandNeon text-xl group-hover:scale-110 transition-transform">
+                                        <i class="fa-solid fa-play ml-0.5"></i>
+                                    </div>
+                                </div>
+                                <div class="absolute inset-0 bg-brandNeon/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            </div>
+                        \` : \`
+                            <div class="relative w-full overflow-hidden bg-neutral-950 mb-4 pointer-events-none">
+                                <img src="\${cleanGoogleDriveUrl(project.img, project.category)}" 
+                                     alt="\${project.title}" 
+                                     onerror="this.src='https://images.unsplash.com/photo-1578587018452-892bacefd3f2?q=80&w=600&auto=format&fit=crop'"
+                                     class="w-full h-auto block group-hover:scale-105 transition-transform duration-500">
+                                <div class="absolute inset-0 bg-brandNeon/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            </div>
+                        \`;
+
+                        card.innerHTML = \`
+                            \${mediaHtml}
+                            <div class="flex justify-between items-center">
+                                <div class="min-w-0 flex-1">
+                                    <h3 class="font-display font-bold uppercase text-white group-hover:text-brandNeon transition-colors truncate project-card-title">\${project.title}</h3>
+                                    <p class="text-gray-500 truncate project-card-desc">\${project.desc}</p>
+                                </div>
+                                \${isVid ? \`<span class="ml-2 shrink-0 text-[10px] font-bold uppercase tracking-wider bg-brandNeon text-black px-2 py-0.5">VIDEO</span>\` : ''}
+                            </div>
+                        \`;
+
+                        if (isVid) {
+                            card.addEventListener('mouseenter', () => {
+                                const v = card.querySelector('video');
+                                if(v) v.play().catch(e=>{});
+                            });
+                            card.addEventListener('mouseleave', () => {
+                                const v = card.querySelector('video');
+                                if(v) {
+                                    v.pause();
+                                    v.currentTime = 1;
+                                }
+                            });
+                        }
+
+                        grid.appendChild(card);
+                    });
+                    const s = document.getElementById('portfolioScaleSlider');
+                    if(s) applyGalleryScale(parseInt(s.value));
+                }
+
+                function filterGallery(category) {
+                    const cards = document.querySelectorAll('.project-card');
+                    const buttons = document.querySelectorAll('.filter-btn');
+                    buttons.forEach(btn => {
+                        btn.classList.remove('active', 'border-brandNeon', 'bg-brandNeon', 'text-black');
+                        btn.classList.add('border-white/10', 'text-white');
+                    });
+                    if (event && event.target) {
+                        event.target.classList.add('active', 'border-brandNeon', 'bg-brandNeon', 'text-black');
+                        event.target.classList.remove('border-white/10', 'text-white');
+                    }
+                    cards.forEach(card => {
+                        const cardCategory = card.getAttribute('data-category');
+                        if (category === 'all' || cardCategory === category) {
+                            card.style.display = 'inline-block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                }
+
+                let currentLightboxIndex = 0;
+                function openLightbox(index) {
+                    currentLightboxIndex = index;
+                    const project = projects[index];
+                    if(!project) return;
+
+                    const modal = document.getElementById('lightbox-modal');
+                    const imgWrap = document.getElementById('lightbox-img-wrap');
+                    const videoWrap = document.getElementById('lightbox-video-wrap');
+                    const img = document.getElementById('lightbox-img');
+                    
+                    const video = document.getElementById('lightbox-video');
+                    const iframeWrap = document.getElementById('lightbox-iframe-wrap');
+                    const iframe = document.getElementById('lightbox-iframe');
+                    const videoControls = document.getElementById('video-controls');
+                    const videoFallbackBar = document.getElementById('video-fallback-bar');
+
+                    document.getElementById('lightbox-title').innerText = project.title;
+                    document.getElementById('lightbox-desc').innerText = project.desc;
+                    
+                    video.pause();
+                    video.src = '';
+                    if (video.load) {
+                        try { video.load(); } catch(e) {}
+                    }
+                    iframe.src = '';
+                    
+                    iframeWrap.classList.add('hidden');
+                    video.classList.remove('hidden');
+                    videoControls.classList.remove('hidden');
+                    videoFallbackBar.classList.add('hidden');
+
+                    if (isVideoProject(project)) {
+                        imgWrap.classList.add('hidden');
+                        videoWrap.classList.remove('hidden');
+
+                        const driveId = getGoogleDriveId(project.img);
+                        if (driveId) {
+                            const streamUrl = 'https://docs.google.com/uc?export=download&id=' + driveId;
+                            video.src = streamUrl;
+                            video.onerror = function() {
+                                video.classList.add('hidden');
+                                videoControls.classList.add('hidden');
+                                iframeWrap.classList.remove('hidden');
+                                iframe.src = 'https://drive.google.com/file/d/' + driveId + '/preview';
+                                videoFallbackBar.classList.remove('hidden');
+                                document.getElementById('video-direct-link').href = project.img;
+                            };
+                            video.load();
+                            video.play().catch(e => console.log(e.message));
+                        } else {
+                            video.src = project.img;
+                            video.onerror = function() {
+                                videoFallbackBar.classList.remove('hidden');
+                                document.getElementById('video-direct-link').href = project.img;
+                            };
+                            video.load();
+                            video.play().catch(e => console.log(e.message));
+                        }
+                        document.getElementById('video-play-icon').className = 'fa-solid fa-pause';
+                    } else {
+                        imgWrap.classList.remove('hidden');
+                        videoWrap.classList.add('hidden');
+                        img.src = cleanGoogleDriveUrl(project.img, project.category);
+                    }
+                    modal.classList.remove('opacity-0', 'pointer-events-none');
+                }
+
+                function closeLightbox() {
+                    document.getElementById('lightbox-modal').classList.add('opacity-0', 'pointer-events-none');
+                    const video = document.getElementById('lightbox-video');
+                    video.pause();
+                    video.src = '';
+                    const iframe = document.getElementById('lightbox-iframe');
+                    iframe.src = '';
+                }
+
+                function prevLightbox() {
+                    let nextIdx = currentLightboxIndex - 1;
+                    if (nextIdx < 0) nextIdx = projects.length - 1;
+                    openLightbox(nextIdx);
+                }
+
+                function nextLightbox() {
+                    let nextIdx = currentLightboxIndex + 1;
+                    if (nextIdx >= projects.length) nextIdx = 0;
+                    openLightbox(nextIdx);
+                }
+
+                document.addEventListener('DOMContentLoaded', function() {
+                    const video = document.getElementById('lightbox-video');
+                    if (!video) return;
+                    video.addEventListener('timeupdate', function() {
+                        const pct = video.duration ? (video.currentTime / video.duration) * 100 : 0;
+                        document.getElementById('video-progress-bar').style.width = pct + '%';
+                        document.getElementById('video-progress-thumb').style.left = pct + '%';
+                        document.getElementById('video-current-time').textContent = formatTime(video.currentTime);
+                    });
+                    video.addEventListener('loadedmetadata', function() {
+                        document.getElementById('video-total-time').textContent = formatTime(video.duration);
+                    });
+                });
+
+                function formatTime(sec) {
+                    if (isNaN(sec)) return '0:00';
+                    const m = Math.floor(sec / 60);
+                    const s = Math.floor(sec % 60);
+                    return m + ':' + (s < 10 ? '0' : '') + s;
+                }
+
+                function toggleVideoPlay() {
+                    const video = document.getElementById('lightbox-video');
+                    if (video.paused) { video.play().catch(e => console.log(e.message)); } else { video.pause(); }
+                }
+
+                function seekVideo(e) {
+                    const video = document.getElementById('lightbox-video');
+                    const bar = document.getElementById('video-progress-wrap');
+                    const rect = bar.getBoundingClientRect();
+                    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                    if (video.duration) video.currentTime = ratio * video.duration;
+                }
+
+                function rewindVideo() {
+                    const video = document.getElementById('lightbox-video');
+                    video.currentTime = Math.max(0, video.currentTime - 10);
+                }
+
+                function forwardVideo() {
+                    const video = document.getElementById('lightbox-video');
+                    video.currentTime = Math.min(video.duration || 0, video.currentTime + 10);
+                }
+
+                function setVideoVolume(val) {
+                    const video = document.getElementById('lightbox-video');
+                    video.volume = parseFloat(val);
+                    video.muted = (parseFloat(val) === 0);
+                    updateVolumeIcon(video.muted);
+                }
+
+                function setVideoSpeed(rate) {
+                    document.getElementById('lightbox-video').playbackRate = parseFloat(rate);
+                }
+
+                function toggleMuteVideo() {
+                    const video = document.getElementById('lightbox-video');
+                    video.muted = !video.muted;
+                    updateVolumeIcon(video.muted);
+                    document.getElementById('video-volume').value = video.muted ? 0 : video.volume;
+                }
+
+                function updateVolumeIcon(muted) {
+                    const icon = document.getElementById('video-mute-icon');
+                    if (muted) {
+                        icon.className = 'fa-solid fa-volume-xmark text-brandPink';
+                    } else {
+                        icon.className = 'fa-solid fa-volume-high text-gray-400';
+                    }
+                }
+
+                window.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') closeLightbox();
+                    if (e.key === 'ArrowRight' && !document.getElementById('lightbox-modal').classList.contains('pointer-events-none')) nextLightbox();
+                    if (e.key === 'ArrowLeft' && !document.getElementById('lightbox-modal').classList.contains('pointer-events-none')) prevLightbox();
+                });
+            `;
+
+            const finalScriptTag = cloneDoc.querySelector('script:last-of-type');
+            if (finalScriptTag) {
+                finalScriptTag.innerHTML = scriptStr + coreScript;
+            }
+
+            const finalHTML = '<!DOCTYPE html>\n' + cloneDoc.outerHTML;
+            const blob = new Blob([finalHTML], { type: 'text/html' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'alfinanfahri_portfolio.html';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+
+    <!-- Unified Scale Slider Controller Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded',function(){
+            const s=document.getElementById('portfolioScaleSlider');
+            if(!s)return;
+            const v=document.getElementById('portfolioScaleValue');
+            const saved=Math.min(parseInt(localStorage.getItem('portfolioScale')||100),100);
+            s.value=saved;
+            v.textContent=saved+'%';
+            applyGalleryScale(saved);
+            s.addEventListener('input',function(){
+                const val=parseInt(this.value);
+                v.textContent=val+'%';
+                localStorage.setItem('portfolioScale',val);
+                applyGalleryScale(val);
+            });
+            window.addEventListener('resize',function(){
+                applyGalleryScale(parseInt(s.value));
+            });
+        });
+
+        // Fixed Scale algorithm that dynamically operates multi-column states on Mobile viewports
+        function applyGalleryScale(val){
+            const grid=document.getElementById('gallery-grid');
+            if(!grid)return;
+            
+            grid.style.setProperty('--card-scale', val / 100);
+            
+            let cols=1;
+            const width=window.innerWidth;
+            if (width >= 1024) {
+                if(val>=80)cols=3;
+                else if(val>=55)cols=4;
+                else if(val>=38)cols=5;
+                else cols=6;
+            } else if (width >= 768) {
+                if(val>=70)cols=2;
+                else if(val>=40)cols=3;
+                else cols=4;
+            } else {
+                if (val >= 70) cols = 1;
+                else if (val >= 40) cols = 2;
+                else cols = 3;
+            }
+            grid.style.columnCount=cols;
+            grid.style.gap='1.5rem';
+        }
+    </script>
+</body>
+</html>
